@@ -4,71 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vue Note App</title>
-    <!-- Подключаем Vue через CDN -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script defer src="js/main.js"></script>
+    <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
 
-<!-- Основной контент, где будут отображаться заметки -->
-<div id="app">
-    <h1>Vue Note App</h1>
+<div id="app" class="app">
+    <!-- Боковая панель -->
+    <div id="sidebar" class="sidebar">
+        <h2>Create New Note</h2>
+        <div class="form-container">
+            <input type="text" v-model="newNoteTitle" class="input" placeholder="Note title" />
+            <textarea v-model="newNoteTasks" class="textarea" placeholder="Enter tasks (separate by commas)"></textarea>
+            <button @click="createNote" class="btn">Create Note</button>
+        </div>
+    </div>
 
-    <!-- Форма для создания новой заметки -->
-    <input type="text" v-model="newNoteTitle" placeholder="Note title" />
-    <textarea v-model="newNoteTasks" placeholder="Enter tasks (separate by commas)"></textarea>
-    <button @click="createNote">Create Note</button>
+    <!-- Основной контент -->
+    <div class="content">
+        <h1 class="title">Vue Note App</h1>
 
-    <!-- Список созданных заметок -->
-    <div v-if="notes.length > 0">
-        <h2>Notes:</h2>
-        <ul>
-            <li v-for="(note, index) in notes" :key="index">
-                <h3>{{ note.title }}</h3>
-                <ul>
-                    <li v-for="(task, taskIndex) in note.tasks" :key="taskIndex">
-                        <input type="checkbox" v-model="task.completed" /> {{ task.text }}
-                    </li>
-                </ul>
-            </li>
-        </ul>
+        <!-- Список созданных заметок -->
+        <div v-if="notes.length > 0" class="notes-list">
+            <h2>Notes:</h2>
+            <ul>
+                <li v-for="(note, index) in notes" :key="index" class="note-card">
+                    <h3>{{ note.title }}</h3>
+                    <ul>
+                        <li v-for="(task, taskIndex) in note.tasks" :key="taskIndex" class="task-item">
+                            <input type="checkbox" v-model="task.completed" /> {{ task.text }}
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
     </div>
 </div>
-
-<script>
-    new Vue({
-        el: '#app',
-        data: {
-            newNoteTitle: '',
-            newNoteTasks: '',
-            notes: []
-        },
-        methods: {
-            // Метод для создания новой заметки
-            createNote() {
-                if (this.newNoteTitle.trim() && this.newNoteTasks.trim()) {
-                    // Разбиваем задачи на массив
-                    const tasks = this.newNoteTasks.split(',').map(task => ({
-                        text: task.trim(),
-                        completed: false
-                    }));
-
-                    // Создаем новую заметку
-                    const newNote = {
-                        title: this.newNoteTitle,
-                        tasks: tasks
-                    };
-
-                    // Добавляем новую заметку в массив
-                    this.notes.push(newNote);
-
-                    // Очищаем поля для ввода
-                    this.newNoteTitle = '';
-                    this.newNoteTasks = '';
-                }
-            }
-        }
-    });
-</script>
 
 </body>
 </html>
