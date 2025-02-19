@@ -22,37 +22,39 @@
         <button @click="createNote" class="btn">Create Note</button>
     </div>
 
-
     <div v-if="alertMessage" class="alert">
         {{ alertMessage }}
     </div>
 
     <!-- Контейнер для 3-х столбцов -->
     <div class="columns">
+        <!-- Первый столбец -->
         <div class="column">
             <h2>Column 1 (max 3)</h2>
             <div v-for="(note, index) in firstColumn" :key="index" class="note-card">
                 <h3>{{ note.title }}</h3>
                 <ul>
                     <li v-for="(task, taskIndex) in note.tasks" :key="taskIndex" class="task-item">
-                        <input type="checkbox" v-model="task.completed" /> {{ task.text }}
+                        <input type="checkbox" v-model="task.completed" @change="toggleTaskCompletion(note, task)" /> {{ task.text }}
                     </li>
                 </ul>
             </div>
         </div>
 
+        <!-- Второй столбец -->
         <div class="column">
             <h2>Column 2 (max 5)</h2>
             <div v-for="(note, index) in secondColumn" :key="index" class="note-card">
                 <h3>{{ note.title }}</h3>
                 <ul>
                     <li v-for="(task, taskIndex) in note.tasks" :key="taskIndex" class="task-item">
-                        <input type="checkbox" v-model="task.completed" /> {{ task.text }}
+                        <input type="checkbox" v-model="task.completed" @change="toggleTaskCompletion(note, task)" /> {{ task.text }}
                     </li>
                 </ul>
             </div>
         </div>
 
+        <!-- Третий столбец -->
         <div class="column">
             <h2>Column 3 (no limit)</h2>
             <div v-for="(note, index) in thirdColumn" :key="index" class="note-card">
@@ -62,6 +64,9 @@
                         <input type="checkbox" v-model="task.completed" :disabled="true" /> {{ task.text }}
                     </li>
                 </ul>
+                <div v-if="note.lastCompletedTime">
+                    <p>Last Completed: {{ note.lastCompletedTime }}</p>
+                </div>
             </div>
         </div>
     </div>
