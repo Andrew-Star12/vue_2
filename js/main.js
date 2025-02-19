@@ -28,34 +28,48 @@ new Vue({
                 return;
             }
 
-            // Проверка, если во второй колонке уже 5 заметок
+            // Если во втором столбце уже 5 заметок, перемещаем одну из первой в третью
             if (this.secondColumn.length >= 5) {
-                this.alertMessage = "Во втором столбце не может быть больше 5-ти заметок!";
-                setTimeout(() => {
-                    this.alertMessage = ''; // Скрываем сообщение через 3 секунды
-                }, 3000);
-                return;
+                // Перемещаем одну заметку из первого столбца в третий
+                const noteToMove = this.firstColumn[0]; // Берем первую заметку из первого столбца
+                this.firstColumn.splice(0, 1); // Удаляем ее из первого столбца
+                this.thirdColumn.push(noteToMove); // Добавляем в третий столбец
             }
 
-            if (this.newNoteTitle.trim() && this.newNoteTasks.trim()) {
-                // Разбиваем задачи на массив
-                const tasks = this.newNoteTasks.split(',').map(task => ({
-                    text: task.trim(),
-                    completed: false
-                }));
+            // Проверка, если во второй колонке уже 5 заметок
+            if (this.secondColumn.length < 5) {
+                if (this.newNoteTitle.trim() && this.newNoteTasks.trim()) {
+                    // Разбиваем задачи на массив
+                    const tasks = this.newNoteTasks.split(',').map(task => ({
+                        text: task.trim(),
+                        completed: false
+                    }));
 
-                // Создаем новую заметку с массивом задач
-                const newNote = {
-                    title: this.newNoteTitle,
-                    tasks: tasks // Убедимся, что tasks всегда массив
-                };
+                    // Проверка на количество задач в заметке (от 3 до 5)
+                    if (tasks.length < 3 || tasks.length > 5) {
+                        this.alertMessage = "Каждая заметка должна содержать от 3 до 5 пунктов!";
+                        setTimeout(() => {
+                            this.alertMessage = ''; // Скрываем сообщение через 3 секунды
+                        }, 3000);
+                        return;
+                    }
 
-                // Добавляем новую заметку в массив
-                this.notes.push(newNote);
+                    // Создаем новую заметку с массивом задач
+                    const newNote = {
+                        title: this.newNoteTitle,
+                        tasks: tasks // Убедимся, что tasks всегда массив
+                    };
 
-                // Очищаем поля для ввода
-                this.newNoteTitle = '';
-                this.newNoteTasks = '';
+                    // Добавляем новую заметку в массив
+                    this.notes.push(newNote);
+
+                    // После добавления заметки сразу проверим и распределим по столбцам
+                    this.rearrangeColumns();
+
+                    // Очищаем поля для ввода
+                    this.newNoteTitle = '';
+                    this.newNoteTasks = '';
+                }
             }
         },
         // Метод для вычисления процента выполненных задач в заметке
@@ -71,32 +85,49 @@ new Vue({
         // Функция для блокировки редактирования задачи
         isNoteCompleted(note) {
             return this.getTaskCompletionPercentage(note) === 100;
+        },
+        // Метод для перераспределения заметок по колонкам
+        rearrangeColumns() {
+            this.notes.forEach(note => {
+                const completionPercentage = this.getTaskCompletionPercentage(note);
+
+                // Перемещаем в первый столбец, если прогресс меньше 50%
+                if (completionPercentage < 50 && !this.firstColumn.includes(note)) {
+                    if (this.secondColumn.includes(note)) {
+                        this.secondColumn.splice(this.secondColumn.indexOf(note), 1);
+                    } else if (this.thirdColumn.includes(note)) {
+                        this.thirdColumn.splice(this.thirdColumn.indexOf(note), 1);
+                    }
+                    this.firstColumn.push(note);
+                }
+
+                // Перемещаем во второй столбец, если прогресс от 50% до 100%
+                else if (completionPercentage >= 50 && completionPercentage < 100 && !this.secondColumn.includes(note)) {
+                    if (this.firstColumn.includes(note)) {
+                        this.firstColumn.splice(this.firstColumn.indexOf(note), 1);
+                    } else if (this.thirdColumn.includes(note)) {
+                        this.thirdColumn.splice(this.thirdColumn.indexOf(note), 1);
+                    }
+                    this.secondColumn.push(note);
+                }
+
+                // Перемещаем в третий столбец, если прогресс 100%
+                else if (completionPercentage === 100 && !this.thirdColumn.includes(note)) {
+                    if (this.firstColumn.includes(note)) {
+                        this.firstColumn.splice(this.firstColumn.indexOf(note), 1);
+                    } else if (this.secondColumn.includes(note)) {
+                        this.secondColumn.splice(this.secondColumn.indexOf(note), 1);
+                    }
+                    this.thirdColumn.push(note);
+                }
+            });
         }
     },
     watch: {
         // Слежение за изменениями в заметках и задачах для автоматического перемещения
         notes: {
             handler() {
-                // После изменения заметок, необходимо заново распределить их по столбцам
-                this.notes.forEach(note => {
-                    const completionPercentage = this.getTaskCompletionPercentage(note);
-                    if (completionPercentage > 50 && completionPercentage < 100 && !this.secondColumn.includes(note)) {
-                        // Если процент выполнения больше 50%, перемещаем в колонку 2
-                        if (this.firstColumn.includes(note)) {
-                            this.firstColumn.splice(this.firstColumn.indexOf(note), 1);
-                            this.secondColumn.push(note);
-                        }
-                    } else if (completionPercentage === 100 && !this.thirdColumn.includes(note)) {
-                        // Если процент выполнения 100%, перемещаем в колонку 3
-                        if (this.secondColumn.includes(note)) {
-                            this.secondColumn.splice(this.secondColumn.indexOf(note), 1);
-                            this.thirdColumn.push(note);
-                        } else if (this.firstColumn.includes(note)) {
-                            this.firstColumn.splice(this.firstColumn.indexOf(note), 1);
-                            this.thirdColumn.push(note);
-                        }
-                    }
-                });
+                this.rearrangeColumns(); // Автоматически перераспределяем заметки
             },
             deep: true // Следим за вложенными изменениями (например, завершение задач)
         }
