@@ -4,42 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vue Note App</title>
+    <!-- Подключаем Vue через CDN -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
     <script defer src="js/main.js"></script>
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
 
+<!-- Основной контент, где будут отображаться заметки -->
 <div id="app" class="app">
-    <!-- Боковая панель -->
-    <div id="sidebar" class="sidebar">
-        <h2>Create New Note</h2>
-        <div class="form-container">
-            <input type="text" v-model="newNoteTitle" class="input" placeholder="Note title" />
-            <textarea v-model="newNoteTasks" class="textarea" placeholder="Enter tasks (separate by commas)"></textarea>
-            <button @click="createNote" class="btn">Create Note</button>
+    <h1 class="title">Vue Note App</h1>
+
+    <!-- Форма для создания новой заметки -->
+    <div class="form-container">
+        <input type="text" v-model="newNoteTitle" class="input" placeholder="Note title" />
+        <textarea v-model="newNoteTasks" class="textarea" placeholder="Enter tasks (separate by commas)"></textarea>
+        <button @click="createNote" class="btn">Create Note</button>
+    </div>
+
+    <!-- Контейнер для 3-х столбцов -->
+    <div class="columns">
+        <div class="column">
+            <h2>Column 1 (max 3)</h2>
+            <div v-for="(note, index) in firstColumn" :key="index" class="note-card">
+                <h3>{{ note.title }}</h3>
+                <ul>
+                    <li v-for="(task, taskIndex) in note.tasks" :key="taskIndex" class="task-item">
+                        <input type="checkbox" v-model="task.completed" /> {{ task.text }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="column">
+            <h2>Column 2 (max 5)</h2>
+            <div v-for="(note, index) in secondColumn" :key="index" class="note-card">
+                <h3>{{ note.title }}</h3>
+                <ul>
+                    <li v-for="(task, taskIndex) in note.tasks" :key="taskIndex" class="task-item">
+                        <input type="checkbox" v-model="task.completed" /> {{ task.text }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="column">
+            <h2>Column 3 (no limit)</h2>
+            <div v-for="(note, index) in thirdColumn" :key="index" class="note-card">
+                <h3>{{ note.title }}</h3>
+                <ul>
+                    <li v-for="(task, taskIndex) in note.tasks" :key="taskIndex" class="task-item">
+                        <input type="checkbox" v-model="task.completed" /> {{ task.text }}
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 
-    <!-- Основной контент -->
-    <div class="content">
-        <h1 class="title">Vue Note App</h1>
-
-        <!-- Список созданных заметок -->
-        <div v-if="notes.length > 0" class="notes-list">
-            <h2>Notes:</h2>
-            <ul>
-                <li v-for="(note, index) in notes" :key="index" class="note-card">
-                    <h3>{{ note.title }}</h3>
-                    <ul>
-                        <li v-for="(task, taskIndex) in note.tasks" :key="taskIndex" class="task-item">
-                            <input type="checkbox" v-model="task.completed" /> {{ task.text }}
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </div>
 </div>
 
 </body>

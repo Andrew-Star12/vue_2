@@ -5,8 +5,19 @@ new Vue({
         newNoteTasks: '',
         notes: []
     },
+    computed: {
+        // Разделяем заметки на 3 столбца
+        firstColumn() {
+            return this.notes.slice(0, 3);  // Первая колонка ограничена 3 заметками
+        },
+        secondColumn() {
+            return this.notes.slice(3, 8);  // Вторая колонка ограничена 5 заметками
+        },
+        thirdColumn() {
+            return this.notes.slice(8);  // Третья колонка без ограничения
+        }
+    },
     methods: {
-        // Метод для создания новой заметки
         createNote() {
             if (this.newNoteTitle.trim() && this.newNoteTasks.trim()) {
                 // Разбиваем задачи на массив
@@ -15,7 +26,6 @@ new Vue({
                     completed: false
                 }));
 
-                // Создаем новую заметку
                 const newNote = {
                     title: this.newNoteTitle,
                     tasks: tasks
