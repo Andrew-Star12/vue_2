@@ -107,3 +107,17 @@ input[type="checkbox"] {
 .column h2 {
     margin-bottom: 20px;
 }
+
+li{
+    list-style: none;
+}
+
+.alert {
+    padding: 10px;
+    margin-bottom: 20px;
+    background-color: #ffcccc;
+    color: red;
+    border: 1px solid red;
+    border-radius: 5px;
+    text-align: center;
+}

@@ -3,7 +3,8 @@ new Vue({
     data: {
         newNoteTitle: '',
         newNoteTasks: '',
-        notes: []
+        notes: [],
+        alertMessage: '' // Добавляем переменную для отображения сообщения
     },
     computed: {
         firstColumn() {
@@ -18,6 +19,24 @@ new Vue({
     },
     methods: {
         createNote() {
+            // Проверка, если в первой колонке уже 3 заметки
+            if (this.firstColumn.length >= 3) {
+                this.alertMessage = "В первом столбце не может быть больше 3-х заметок!";
+                setTimeout(() => {
+                    this.alertMessage = ''; // Скрываем сообщение через 3 секунды
+                }, 3000);
+                return;
+            }
+
+            // Проверка, если во второй колонке уже 5 заметок
+            if (this.secondColumn.length >= 5) {
+                this.alertMessage = "Во втором столбце не может быть больше 5-ти заметок!";
+                setTimeout(() => {
+                    this.alertMessage = ''; // Скрываем сообщение через 3 секунды
+                }, 3000);
+                return;
+            }
+
             if (this.newNoteTitle.trim() && this.newNoteTasks.trim()) {
                 // Разбиваем задачи на массив
                 const tasks = this.newNoteTasks.split(',').map(task => ({
@@ -25,9 +44,10 @@ new Vue({
                     completed: false
                 }));
 
+                // Создаем новую заметку с массивом задач
                 const newNote = {
                     title: this.newNoteTitle,
-                    tasks: tasks
+                    tasks: tasks // Убедимся, что tasks всегда массив
                 };
 
                 // Добавляем новую заметку в массив
@@ -40,6 +60,10 @@ new Vue({
         },
         // Метод для вычисления процента выполненных задач в заметке
         getTaskCompletionPercentage(note) {
+            if (!note.tasks || !Array.isArray(note.tasks)) {
+                return 0;
+            }
+
             const totalTasks = note.tasks.length;
             const completedTasks = note.tasks.filter(task => task.completed).length;
             return (completedTasks / totalTasks) * 100;
@@ -56,7 +80,7 @@ new Vue({
                 // После изменения заметок, необходимо заново распределить их по столбцам
                 this.notes.forEach(note => {
                     const completionPercentage = this.getTaskCompletionPercentage(note);
-                    if (completionPercentage >= 50 && completionPercentage < 100 && !this.secondColumn.includes(note)) {
+                    if (completionPercentage > 50 && completionPercentage < 100 && !this.secondColumn.includes(note)) {
                         // Если процент выполнения больше 50%, перемещаем в колонку 2
                         if (this.firstColumn.includes(note)) {
                             this.firstColumn.splice(this.firstColumn.indexOf(note), 1);

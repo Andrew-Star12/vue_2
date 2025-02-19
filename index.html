@@ -22,6 +22,11 @@
         <button @click="createNote" class="btn">Create Note</button>
     </div>
 
+
+    <div v-if="alertMessage" class="alert">
+        {{ alertMessage }}
+    </div>
+
     <!-- Контейнер для 3-х столбцов -->
     <div class="columns">
         <div class="column">
