@@ -43,6 +43,10 @@ new Vue({
             const totalTasks = note.tasks.length;
             const completedTasks = note.tasks.filter(task => task.completed).length;
             return (completedTasks / totalTasks) * 100;
+        },
+        // Функция для блокировки редактирования задачи
+        isNoteCompleted(note) {
+            return this.getTaskCompletionPercentage(note) === 100;
         }
     },
     watch: {

@@ -54,7 +54,7 @@
                 <h3>{{ note.title }}</h3>
                 <ul>
                     <li v-for="(task, taskIndex) in note.tasks" :key="taskIndex" class="task-item">
-                        <input type="checkbox" v-model="task.completed" /> {{ task.text }}
+                        <input type="checkbox" v-model="task.completed" :disabled="true" /> {{ task.text }}
                     </li>
                 </ul>
             </div>
