@@ -67,6 +67,9 @@ new Vue({
                     // После добавления заметки сразу проверим и распределим по столбцам
                     this.rearrangeColumns();
 
+                    // Сохраняем обновленный список заметок в localStorage
+                    this.saveNotesToLocalStorage();
+
                     // Очищаем поля для ввода
                     this.newNoteTitle = '';
                     this.newNoteTasks = '';
@@ -128,8 +131,25 @@ new Vue({
             if (task.completed) {
                 // Обновляем время, если задача была завершена
                 note.lastCompletedTime = new Date().toLocaleString();
+                // Сохраняем заметки в localStorage после изменения
+                this.saveNotesToLocalStorage();
+            }
+        },
+        // Метод для сохранения заметок в Local Storage
+        saveNotesToLocalStorage() {
+            localStorage.setItem('notes', JSON.stringify(this.notes));
+        },
+        // Метод для загрузки заметок из Local Storage
+        loadNotesFromLocalStorage() {
+            const savedNotes = localStorage.getItem('notes');
+            if (savedNotes) {
+                this.notes = JSON.parse(savedNotes);
             }
         }
+    },
+    mounted() {
+        // Загружаем данные из Local Storage при инициализации
+        this.loadNotesFromLocalStorage();
     },
     watch: {
         // Слежение за изменениями в заметках и задачах для автоматического перераспределения
